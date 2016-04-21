@@ -56,7 +56,8 @@
 		var loc;
     var Latitude;
     var Longitude;
-    
+    //var deviceID = "4e0032001451343334363036";
+    //var accessToken = "dbc87884ca379b74fb7c8b865a4c7ca61bc156ee";
 
         function initialize() {
             var mapOptions = {
@@ -174,24 +175,28 @@
 
 
 
-startMap();
+
 
 
     }
 
 function startMap(objButton) {
-    loc = new google.maps.LatLng(Latitude, Longitude);
+
 
     marker.setMap(null);
-
+    if((Latitude != null) & (Longitude != null)){
+    loc = new google.maps.LatLng(Latitude, Longitude);
+  }
     marker = new google.maps.Marker({position: loc, map: map});
 
     marker.setMap(null);
 
     map.panTo(loc);
+    map.setZoom(16);
 
     marker.setMap(map);
-    map.setZoom(16);
+
+
 
 }
     </script>
