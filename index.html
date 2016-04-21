@@ -16,34 +16,34 @@
                 margin: 0px;
                 padding: 0px;
             }
-            
+
             h1 {
                 text-align: center;
                 margin-left: auto;
                 margin-right: auto;
             }
-            
+
             #map-canvas {
                 width: 80%;
                 height: 80%;
                 margin-left: auto;
                 margin-right: auto;
             }
-            
+
             html,
             body {
                 padding: 5px;
             }
-            
+
             #data-table {
                 font-family: calibri, arial;
                 width: 400px;
             }
-            
+
             #data-table thead td {
                 background-color: #8CCCF1;
             }
-            
+
             #data-table td {
                 border: 1px solid #466E85;
                 width: 136px;
@@ -52,6 +52,19 @@
         </style>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
         <script type="text/javascript">
+        var map;
+        var marker;
+        var loc;
+        var Latitude;
+        var Longitude;
+        var deviceID = "<-- enter here -->";
+        var accessToken = "<-- enter here -->";
+        var varAlt = "gpsAltitude";
+        var varSpeed = "gpsSpeed";
+        var varLat = "gpsLat";
+        var varLon = "gpsLon";
+
+        
             Parse.initialize("bPUSewIzoIpWZbXmLoBpdtjW5CjDPKKC7Vf6xnYE", "CrmgFndmoQBQt2o7C4mPlBaYNTt22uzZnxVkcphS");
             var PassObject = Parse.Object.extend("keys");
             //var passObject = new PassObject();
@@ -68,11 +81,7 @@
                     alert("error:" + error.message + " - Unable to connect to Parse for Particle ID and Token");
                 }
             });
-            var map;
-            var marker;
-            var loc;
-            var Latitude;
-            var Longitude;
+
 
             function initialize() {
                 var mapOptions = {
@@ -102,12 +111,7 @@
                 document.getElementById("alt").innerHTML = "Waiting for data...";
                 document.getElementById("tstamp").innerHTML = "";
                 document.getElementById("spd").innerHTML = "";
-                var deviceID = "<-- enter here -->";
-                var accessToken = "<-- enter here -->";
-                var varAlt = "gpsAltitude";
-                var varSpeed = "gpsSpeed";
-                var varLat = "gpsLat";
-                var varLon = "gpsLon";
+
                 requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + varLat + "/?access_token=" + accessToken;
                 $.getJSON(requestURL, function (json) {
                     //document.getElementById("").innerHTML = json.result ;
