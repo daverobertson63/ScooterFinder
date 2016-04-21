@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
 <head>
     <title>Drone GPS Location </title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
+
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js" type="text/javascript" charset="utf-8"></script>
+
     <style>
         html, body
         {
@@ -24,12 +27,37 @@
             margin-left: auto;
             margin-right: auto;
         }
+        html, body {
+          padding: 5px;
+      }
+
+      #data-table {
+          font-family: calibri, arial;
+          width: 400px;
+      }
+
+      #data-table thead td {
+          background-color: #8CCCF1;
+      }
+
+      #data-table td {
+          border: 1px solid #466E85;
+          width: 136px;
+          padding: 7px;
+      }
     </style>
+
+
+
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-    <script>
-        var map;
+    <script type="text/javascript">
+    var map;
 		var marker;
 		var loc;
+    var Latitude;
+    var Longitude;
+    
+
         function initialize() {
             var mapOptions = {
                 zoom: 6,
@@ -56,11 +84,12 @@
 
         google.maps.event.addDomListener(window, 'load', initialize);
 
-		function start() {
+/*		function start() {
 			var deviceID = "4e0032001451343334363036";
 			var accessToken = "dbc87884ca379b74fb7c8b865a4c7ca61bc156ee";
+      //var altitudeSource = new EventSource("https://api.particle.io/v1/devices/"+ deviceID + "/gpsAltitude?access_token="+ accessToken);
 			var eventSource = new EventSource("https://api.spark.io/v1/devices/" + deviceID + "/events/?access_token=" + accessToken);
-
+// https://api.particle.io/v1/devices/4e0032001451343334363036/gpsAltitude?access_token=dbc87884ca379b74fb7c8b865a4c7ca61bc156ee -->
 			eventSource.addEventListener('open', function(e) {
 				console.log("Opened!"); },false);
 
@@ -74,6 +103,7 @@
 				console.log( parsedData.data);
 				console.log(data[0]);
 				console.log(data[1]);
+        console.log(data[2]);
 
 				loc = new google.maps.LatLng(data[0], data[1]);
 
@@ -86,36 +116,134 @@
 				marker.setMap(map);
 
 			}, false);
+
+
+
+
+
 		}
 
 		window.onload=start;
+*/
+
+
+
+
+    function startTwo(objButton) {
+
+
+
+        document.getElementById("alt").innerHTML = "Waiting for data...";
+        document.getElementById("tstamp").innerHTML ="";
+        document.getElementById("spd").innerHTML ="";
+        var deviceID = "4e0032001451343334363036";
+        var accessToken = "dbc87884ca379b74fb7c8b865a4c7ca61bc156ee";
+        var varAlt = "altitude";
+        var varSpeed = "gpsSpeed";
+        var varLat = "gpsLat";
+        var varLon = "gpsLon";
+
+
+        requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + varLat + "/?access_token=" + accessToken;
+        $.getJSON(requestURL, function(json) {
+                 //document.getElementById("").innerHTML = json.result ;
+                 Latitude = json.result;
+                 console.log(Latitude);
+
+               });
+
+         requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + varLon + "/?access_token=" + accessToken;
+         $.getJSON(requestURL, function(json) {
+                  Longitude = json.result;
+                  console.log(Longitude);
+
+                });
+
+        requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + varAlt + "/?access_token=" + accessToken;
+        $.getJSON(requestURL, function(json) {
+                 document.getElementById("alt").innerHTML = json.result ;
+
+                 document.getElementById("tstamp").innerHTML = json.coreInfo.last_heard;
+                 });
+
+         requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + varSpeed + "/?access_token=" + accessToken;
+         $.getJSON(requestURL, function(json) {
+                  document.getElementById("spd").innerHTML = json.result ;
+
+                });
+
+
+
+startMap();
+
+
+    }
+
+function startMap(objButton) {
+    loc = new google.maps.LatLng(Latitude, Longitude);
+
+    marker.setMap(null);
+
+    marker = new google.maps.Marker({position: loc, map: map});
+
+    marker.setMap(null);
+
+    map.panTo(loc);
+
+    marker.setMap(map);
+    map.setZoom(16);
+
+}
     </script>
+
+
+
 </head>
 <body>
-    <h1>Kyle's Drone GPS Locator</h1>
-    <form action="https://api.particle.io/v1/devices/" + deviceID +"/led?access_token=" +accessToken+" method="POST"">
 
-  <button type="submit" form="form1" value="Submit" style="font-size : 20px; width: 100%; height: 100px;">Update</button>
-  </form>
+    <h1>Kyles' Drone GPS Locator</h1>
+<center>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <td><span id="time_heading">Time of Update</span></td>
+                <td><span id="altitude_heading">Altitude (ft) </span></td>
+                <td><span id="speed_heading">Speed (mph) </span></td>
+            </tr>
+
+        </thead>
+
+        <tbody>
+          <tr>
+              <td><span id="tstamp"></span><br></td>
+              <td><span id="alt"></span><br></td>
+              <td><span id="spd"></span><br></td>
+
+          </tr>
+
+
+        </tbody>
+    </table>
+</center>
+
+    <button id="connectbutton" onclick="startTwo()" style="font-size : 20px; width: 100%; height: 100px">Update GPS</button>
+    <button id="mapbutton" onclick="startMap()" style="font-size : 20px; width: 100%; height: 100px">Map It</button>
+
+     <!-- <form action="https://api.particle.io/v1/devices/4e0032001451343334363036/gpsAltitude/?access_token=dbc87884ca379b74fb7c8b865a4c7ca61bc156ee" method="POST">
+    <input type="submit" value="update the gps" onclick="start()">
+  <button type="submit" form="form1" onclick="run()" value="update" style="font-size : 20px; width: 100%; height: 100px;">Update</button>
+
+
+
+
+</form> -->
   </center>
-  <table style="width:70%" border="1">
-  <tr>
-    <td>Altitude</td>
-    <td>FT</td>
 
-  </tr>
-  <tr>
-    <td>Speed</td>
-    <td>MPH</td>
 
-  </tr>
-  <tr>
-    <td>Heading</td>
-    <td>Deg.</td>
 
-  </tr>
-</table>
     <div id="map-canvas">
     </div>
+
+
 </body>
 </html>
